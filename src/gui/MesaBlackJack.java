@@ -370,6 +370,11 @@ public class MesaBlackJack extends JFrame {
 			turnoBanca();
 		} catch (BlackJackException e1)
 		{
+			((JLabel)e.getComponent()).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/cartasPoker/" + 
+					this.partida.getJugadores().get(0).getBaraja().get(this.partida.getJugadores().get(0).getBaraja().size() - 1) + ".png")));
+			
+			cartasPuls.get(momento - 1).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/reverso5.jpg")));
+			
 			JOptionPane.showMessageDialog(contentPane, 
 					"¡Sacaste un BlackJack!", 
 					"BlackJack", 
@@ -387,8 +392,8 @@ public class MesaBlackJack extends JFrame {
 		{
 			finalizarTuTurno();
 			JOptionPane.showMessageDialog(contentPane, 
-					"Perdiste, te pasaste de 21.", 
-					"Fin del juego", 
+					"Te pasaste de 21.", 
+					"Mala suerte", 
 					JOptionPane.WARNING_MESSAGE);
 			turnoBanca();
 		} catch (BlackJackException e1)
@@ -409,33 +414,71 @@ public class MesaBlackJack extends JFrame {
 	{
 		int cont = 0;
 		seguir = true;
-			while (seguir = true)
-			{
-				try {
-				seguir = this.partida.juegaBanca();
-				} catch (FinDeJuegoException e) {
-					JOptionPane.showMessageDialog(contentPane, 
-							"¡La banca se excedió de 21!", 
-							"Banca fuera", 
-							JOptionPane.INFORMATION_MESSAGE);
-					e.printStackTrace();
-				} catch (BlackJackException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println(this.partida.getBanca().getBaraja());
-				this.cartasRival.get(cont).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/cartasPoker/" + 
-						this.partida.getBanca().getBaraja().get(this.partida.getBanca().getBaraja().size() - 1) + ".png")));
+		while (seguir && cont < 10)
+		{
+			try {
+			seguir = this.partida.juegaBanca();
+			this.cartasRival.get(cont).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/cartasPoker/" + 
+					this.partida.getBanca().getBaraja().get(this.partida.getBanca().getBaraja().size() - 1) + ".png")));
 					
 					this.cartasRival.get(cont + 1).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/reverso5.jpg")));
-				try {
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					try {
+						Thread.sleep(3);
+						//TimeUnit.SECONDS.sleep(3);
+					} catch (InterruptedException e)
+					{
+					}
+			} catch (FinDeJuegoException e) {
+				this.cartasRival.get(cont).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/cartasPoker/" + 
+						this.partida.getBanca().getBaraja().get(this.partida.getBanca().getBaraja().size() - 1) + ".png")));
+						
+						this.cartasRival.get(cont + 1).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/reverso5.jpg")));
+				JOptionPane.showMessageDialog(contentPane, 
+						"¡La banca se excedió de 21!", 
+						"Banca fuera", 
+						JOptionPane.INFORMATION_MESSAGE);
+				seguir = false;
+			} catch (BlackJackException e){
+				this.cartasRival.get(cont).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/cartasPoker/" + 
+						this.partida.getBanca().getBaraja().get(this.partida.getBanca().getBaraja().size() - 1) + ".png")));
+						
+						this.cartasRival.get(cont + 1).setIcon(new ImageIcon(MesaBlackJack.class.getResource("/imagenes/reverso5.jpg")));
+				JOptionPane.showMessageDialog(contentPane, 
+						"La banca sacó BlackJack", 
+						"Banca BlackJack", 
+						JOptionPane.INFORMATION_MESSAGE);
+				seguir = false;
 			}
-		System.out.println("Se salio");
+			cont++;
+		}
+		mostrarResultado();
+	}
+
+	private void mostrarResultado()
+	{
+		switch (this.partida.ganadorUnJugador())
+		{
+			case "jugador":
+				JOptionPane.showMessageDialog(contentPane, 
+					"¡Eres el ganador!\nTu puntuación: " + this.partida.getJugadores().get(0).valorMano() +
+					"\nPuntuación banca: " + this.partida.getBanca().valorMano(),
+					"Ganaste", 
+					JOptionPane.INFORMATION_MESSAGE);
+				break;
+			case "banca":
+				JOptionPane.showMessageDialog(contentPane, 
+						"Ganó la banca...\nTu puntuación: " + this.partida.getJugadores().get(0).valorMano() +
+						"\nPuntuación banca: " + this.partida.getBanca().valorMano(),
+						"Perdiste", 
+						JOptionPane.INFORMATION_MESSAGE);
+				break;
+			default:
+				JOptionPane.showMessageDialog(contentPane, 
+						"Empatáste con la banca, ¡inténtalo de nuevo!\nTu puntuación: " + this.partida.getJugadores().get(0).valorMano() +
+						"\nPuntuación banca: " + this.partida.getBanca().valorMano(),
+						"Empate", 
+						JOptionPane.INFORMATION_MESSAGE);
+		}
 	}
 
 	private void finalizarTuTurno()

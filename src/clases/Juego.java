@@ -71,7 +71,6 @@ public class Juego
 	public void jugarCarta(Mano jugador) throws FinDeJuegoException, BlackJackException
 	{
 		this.pedirCarta(jugador);
-		System.out.println(jugador);
 		if (jugador.finDelJuego())
 		{
 			throw new FinDeJuegoException();
@@ -89,15 +88,42 @@ public class Juego
 		if (this.banca.valorMano() == 21)
 			throw new BlackJackException();
 		if (banca.valorMano() < 17)
+		{
 			sigue = true;
+		}
 		else
 		{
 			for (int i = 0; i < this.getJugadores().size(); i++)
 			{
 				if (banca.valorMano() < this.getJugadores().get(i).valorMano() && this.getJugadores().get(i).valorMano() <= 21)
-					sigue =  true;
+				{
+					sigue = true;
+				}
 			}
 		}
 		return sigue;
+	}
+	
+	public String ganadorUnJugador() {
+		String res ="banca";
+		if (! this.getJugadores().get(0).finDelJuego())
+		{
+			if (this.getJugadores().get(0).valorMano() > banca.valorMano())
+			{
+				res="jugador";
+			}
+			else if (this.getJugadores().get(0).valorMano() == banca.valorMano())
+			{
+				res="empate";
+			}
+			else
+			{
+				if (this.banca.finDelJuego())
+				{
+					res="jugador";
+				}
+			}
+		}
+		return res;
 	}
 }
